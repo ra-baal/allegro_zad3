@@ -1,52 +1,10 @@
 #!/usr/bin/python3
 
 import flask
-import requests
+import services
 
 
 app = flask.Flask(__name__)
-
-
-def github_request(username: str) -> list:
-    """
-    Sends the request to GitHub.
-    :param username: The name of a GitHub user.
-    :return: JSON data as a Python list.
-    """
-
-    url = f"https://api.github.com/users/{username}/repos"
-    headers = {'accept': 'application/vnd.github.v3+json'}
-    response = requests.get(url, headers=headers)
-
-    return response.json()  # list
-
-
-def prepare_repos_list(json_list: list) -> str:
-    """
-    Extracts the necessary data (names and stars of repos).
-    :param json_list: JSON data (list) to extract the necessary data.
-    :return: JSON data (str).
-    """
-
-    repos_stars = list(map(
-        lambda repo: {
-            'name': repo['name'],
-            'stars': repo['stargazers_count']
-        }, json_list))
-
-    return flask.json.dumps(repos_stars)
-
-
-def prepare_stars_sum(json_list: list) -> str:
-    """
-    Extracts the necessary data (sum of stars in repos).
-    :param json_list: JSON data (list).
-    :return: JSON data (str).
-    """
-
-    starssum = sum(repo["stargazers_count"] for repo in json_list)
-
-    return flask.json.dumps({"starssum": starssum})
 
 
 @app.route('/<username>/starssum')
@@ -54,10 +12,10 @@ def stars_sum(username):
     """
     Endpoint. The sum of the stars for the user.
     """
-    github_response = github_request(username)
+    github_response = services.github_request(username)
 
     try:
-        json_data = prepare_stars_sum(github_response)
+        json_data = services.prepare_stars_sum(github_response)
     except TypeError:
         json_data = flask.json.dumps({"message": "Such user does not exist."})
 
@@ -69,10 +27,10 @@ def repos_list(username):
     """
     Endpoint. The list of repository names and number of stars.
     """
-    github_response = github_request(username)
+    github_response = services.github_request(username)
 
     try:
-        json_data = prepare_repos_list(github_response)
+        json_data = services.prepare_repos_list(github_response)
     except TypeError:
         json_data = flask.json.dumps({"message": "Such user does not exist."})
 
