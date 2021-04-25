@@ -3,20 +3,23 @@
     <head>
         <title>{{ title }}</title>
     </head>
+
     <body>
+
         <form method="POST">
 
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" required><br>
 
-            <label for="list">List of repos:</label>
-            <input type="radio" id="list" name="list-or-sum" value="list" checked><br>
+            <input type="radio" id="list" name="list-or-sum" value="list" checked>
+            <label for="list">List of repos</label><br>
 
-            <label for="sum">Sum of stars:</label>
-            <input type="radio" id="sum" name="list-or-sum" value="sum"><br>
+            <input type="radio" id="sum" name="list-or-sum" value="sum">
+            <label for="sum">Sum of stars</label><br>
 
             <input type="submit" value="Send">
 
         </form>
+
     </body>
 </html>
