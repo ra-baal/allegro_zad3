@@ -15,8 +15,8 @@ def github_request(username: str) -> list:
     """
 
     url = f"https://api.github.com/users/{username}/repos"
-
-    response = requests.get(url)
+    headers = {'accept': 'application/vnd.github.v3+json'}
+    response = requests.get(url, headers=headers)
 
     json_list = response.json()  # list
 
@@ -99,24 +99,28 @@ def error404(e):
     return json_data, 404
 
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET'])
 def form():
     """
     Form page.
     """
 
-    if flask.request.method == 'POST':
-
-        formdata = flask.request.form.items()
-        username = next(formdata)[1]
-        list_or_sum = next(formdata)[1]
-
-        if list_or_sum == 'list':
-            return flask.redirect(f'/{username}')
-        else:
-            return flask.redirect(f'/{username}/starssum')
-
     return flask.render_template('form.html', title="GitHub users' repositories")
+
+
+@app.route('/', methods=['POST'])
+def form_redirection():
+    """
+    Form page redirection.
+    """
+
+    username = flask.request.form.get('username')
+    list_or_sum = flask.request.form.get('list-or-sum')
+
+    if list_or_sum == 'list':
+        return flask.redirect(f'/{username}')
+    else:
+        return flask.redirect(f'/{username}/starssum')
 
 
 if __name__ == '__main__':
