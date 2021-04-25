@@ -18,9 +18,7 @@ def github_request(username: str) -> list:
     headers = {'accept': 'application/vnd.github.v3+json'}
     response = requests.get(url, headers=headers)
 
-    json_list = response.json()  # list
-
-    return json_list
+    return response.json()  # list
 
 
 def prepare_repos_list(json_list: list) -> str:
@@ -30,16 +28,13 @@ def prepare_repos_list(json_list: list) -> str:
     :return: JSON data (str).
     """
 
-    repos_stars = []
-    for repo in json_list:
-        name = repo['name']
-        stars = repo['stargazers_count']
-        repos_stars.append({"name": name,
-                            "stars": stars})
+    repos_stars = list(map(
+        lambda repo: {
+            'name': repo['name'],
+            'stars': repo['stargazers_count']
+        }, json_list))
 
-    json_data = flask.json.dumps(repos_stars)
-
-    return json_data
+    return flask.json.dumps(repos_stars)
 
 
 def prepare_stars_sum(json_list: list) -> str:
@@ -51,9 +46,7 @@ def prepare_stars_sum(json_list: list) -> str:
 
     starssum = sum(repo["stargazers_count"] for repo in json_list)
 
-    json_data = flask.json.dumps({"starssum": starssum})
-
-    return json_data
+    return flask.json.dumps({"starssum": starssum})
 
 
 @app.route('/<username>/starssum')
@@ -68,9 +61,7 @@ def stars_sum(username):
     except TypeError:
         json_data = flask.json.dumps({"message": "Such user does not exist."})
 
-    response = flask.Response(json_data, mimetype='application/json')
-
-    return response
+    return flask.Response(json_data, mimetype='application/json')
 
 
 @app.route('/<username>')
@@ -85,8 +76,7 @@ def repos_list(username):
     except TypeError:
         json_data = flask.json.dumps({"message": "Such user does not exist."})
 
-    response = flask.Response(json_data, mimetype='application/json')
-    return response
+    return flask.Response(json_data, mimetype='application/json')
 
 
 @app.errorhandler(404)
@@ -125,8 +115,8 @@ def form_redirection():
 
 if __name__ == '__main__':
 
-    app.run(debug=True)
-    # app.run(debug=False)
+    # app.run(debug=True)
+    app.run(debug=False)
 
 
 #
